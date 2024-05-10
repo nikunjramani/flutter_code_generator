@@ -1,4 +1,4 @@
-package com.flutter_code_generator.flutter_code_generator.intention_action;
+package com.flutter_code_generator.flutter_code_generator.intention_action
 
 import com.intellij.psi.PsiElement
 

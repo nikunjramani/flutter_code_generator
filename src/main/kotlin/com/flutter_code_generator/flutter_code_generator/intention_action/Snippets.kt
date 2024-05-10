@@ -3,9 +3,9 @@ package com.flutter_code_generator.flutter_code_generator.intention_action
 object Snippets {
     const val PREFIX_SELECTION: String = "Subject"
 
-    const val SUFFIX1: String = "Bloc"
-    const val SUFFIX2: String = "State"
-    const val SUFFIX3: String = "Repository"
+    private const val SUFFIX1: String = "Bloc"
+    private const val SUFFIX2: String = "State"
+    private const val SUFFIX3: String = "Repository"
 
     const val BLOC_SNIPPET_KEY: String = PREFIX_SELECTION + SUFFIX1
     const val STATE_SNIPPET_KEY: String = PREFIX_SELECTION + SUFFIX2

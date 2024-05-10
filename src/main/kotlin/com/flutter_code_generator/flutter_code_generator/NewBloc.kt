@@ -22,7 +22,7 @@ import javax.swing.*
 class NewBloc : AnAction() {
     private var project: Project? = null
     private var psiPath: String? = null
-    private lateinit var data: BlocTaoData;
+    private lateinit var data: BlocTaoData
 
     /**
      * Overall popup entity
@@ -30,14 +30,6 @@ class NewBloc : AnAction() {
     private var jDialog: JDialog? = null
     private var nameTextField: JTextField? = null
     private var templateGroup: ButtonGroup? = null
-
-    /**
-     * Checkbox
-     * Use folder：default true
-     * Use prefix：default false
-     */
-    private val folderBox: JCheckBox? = null
-    private val prefixBox: JCheckBox? = null
 
     override fun actionPerformed(event: AnActionEvent) {
         project = event.project
@@ -80,7 +72,7 @@ class NewBloc : AnAction() {
         //Create a file
         createFile()
         //Refresh project
-        project!!.baseDir.refresh(false, true)
+        project!!.projectFile?.refresh(false, true)
     }
 
     /**
@@ -107,11 +99,11 @@ class NewBloc : AnAction() {
         //Set the main module style：mode, function
         template.border = BorderFactory.createTitledBorder("Select Mode")
         //default: high setting
-        val defaultBtn: JRadioButton = JRadioButton(BlocConfig.modeDefault, data.defaultMode === 0)
+        val defaultBtn = JRadioButton(BlocConfig.modeDefault, data.defaultMode == 0)
         defaultBtn.actionCommand = BlocConfig.modeDefault
-        setPadding(defaultBtn, 5, 10)
-        val highBtn: JRadioButton = JRadioButton(BlocConfig.modeHigh, data.defaultMode === 1)
-        setPadding(highBtn, 5, 10)
+        setPadding(defaultBtn)
+        val highBtn = JRadioButton(BlocConfig.modeHigh, data.defaultMode == 1)
+        setPadding(highBtn)
         highBtn.actionCommand = BlocConfig.modeHigh
 
         template.add(defaultBtn)
@@ -121,19 +113,6 @@ class NewBloc : AnAction() {
         templateGroup!!.add(highBtn)
 
         container.add(template)
-        setDivision(container)
-    }
-
-    /**
-     * Generate file
-     */
-    private fun setCodeFile(container: Container) {
-        //Select build file
-        val file = JPanel()
-        file.layout = GridLayout(2, 2)
-        file.border = BorderFactory.createTitledBorder("Select Function")
-
-        container.add(file)
         setDivision(container)
     }
 
@@ -172,9 +151,9 @@ class NewBloc : AnAction() {
     private fun createFile() {
         val type = templateGroup!!.selection.actionCommand
         //deal default value
-        if (BlocConfig.modeDefault.equals(type)) {
+        if (BlocConfig.modeDefault == type) {
             data.defaultMode = 0
-        } else if (BlocConfig.modeHigh.equals(type)) {
+        } else if (BlocConfig.modeHigh == type) {
             data.defaultMode = 1
         }
 
@@ -194,17 +173,17 @@ class NewBloc : AnAction() {
         val path = psiPath + folder
         val cubitPath = "$path/cubit"
         val viewPath = "$path/view"
-        generateFile("cubit/view/page.dart", viewPath, (prefixName + data.viewName?.toLowerCase()).toString() + ".dart")
+        generateFile("cubit/view/page.dart", viewPath, (prefixName + data.viewName?.lowercase()) + ".dart")
         generateFile(
             "cubit/view/view.dart",
             viewPath,
-            (prefixName + data.viewFileName?.toLowerCase()).toString() + ".dart"
+            (prefixName + data.viewFileName?.lowercase()) + ".dart"
         )
         generateFile("cubit/cubit/state.dart", cubitPath, prefixName + "state" + ".dart")
         generateFile(
             "cubit/cubit/cubit.dart",
             cubitPath,
-            (prefixName + data.cubitName?.toLowerCase()).toString() + ".dart"
+            (prefixName + data.cubitName?.lowercase()) + ".dart"
         )
     }
 
@@ -215,11 +194,11 @@ class NewBloc : AnAction() {
         generateFile(
             "bloc/view/view.dart",
             viewPath,
-            (prefixName + data.viewFileName?.toLowerCase()).toString() + ".dart"
+            (prefixName + data.viewFileName?.lowercase()) + ".dart"
         )
-        generateFile("bloc/view/page.dart", viewPath, (prefixName + data.viewName?.toLowerCase()).toString() + ".dart")
-        generateFile("bloc/bloc/bloc.dart", blocPath, (prefixName + data.blocName?.toLowerCase()).toString() + ".dart")
-        generateFile("bloc/bloc/event.dart", blocPath, (prefixName + data.eventName?.toLowerCase()).toString() + ".dart")
+        generateFile("bloc/view/page.dart", viewPath, (prefixName + data.viewName?.lowercase()) + ".dart")
+        generateFile("bloc/bloc/bloc.dart", blocPath, (prefixName + data.blocName?.lowercase()) + ".dart")
+        generateFile("bloc/bloc/event.dart", blocPath, (prefixName + data.eventName?.lowercase()) + ".dart")
         generateFile("bloc/bloc/state.dart", blocPath, prefixName + "state" + ".dart")
     }
 
@@ -231,7 +210,7 @@ class NewBloc : AnAction() {
         //Write file
         try {
             val folder = File(filePath)
-            // if file doesnt exists, then create it
+            // if file doesn't exist, then create it
             if (!folder.exists()) {
                 folder.mkdirs()
             }
@@ -256,16 +235,15 @@ class NewBloc : AnAction() {
         val type = templateGroup!!.selection.actionCommand
 
         //read file
-        var content = ""
+        var content: String
         try {
             val `in` = this.javaClass.getResourceAsStream(baseFolder + inputFileName)
-            content = String(readStream(`in`))
+            content = String(readStream(`in`!!))
         } catch (e: Exception) {
+            throw e
         }
-
-        var prefixName = ""
         //Adding a prefix requires modifying the imported class name
-        prefixName = CaseFormat.LOWER_CAMEL.to(
+        val prefixName: String = CaseFormat.LOWER_CAMEL.to(
             CaseFormat.LOWER_UNDERSCORE, upperCase(
                 nameTextField!!.text
             )
@@ -286,37 +264,37 @@ class NewBloc : AnAction() {
             content = content.replace("InitEvent".toRegex(), "Init" + data.eventName)
             content = content.replace(
                 "event.dart".toRegex(),
-                (prefixName + data.eventName?.toLowerCase()).toString() + ".dart"
+                (prefixName + data.eventName?.lowercase()) + ".dart"
             )
-            content = content.replace("event\\)".toRegex(), data.eventName?.toLowerCase() + "\\)")
-            content = content.replace("event is".toRegex(), data.eventName?.toLowerCase() + " is")
+            content = content.replace("event\\)".toRegex(), data.eventName?.lowercase() + "\\)")
+            content = content.replace("event is".toRegex(), data.eventName?.lowercase() + " is")
             content = content.replace("state.dart", prefixName + "state" + ".dart")
             content = content.replace("blocs.dart", prefixName + "bloc" + ".dart")
             content = content.replace("view.dart", prefixName + "view" + ".dart")
         }
         //replace Event
-        if (outFileName.contains(data.eventName!!.toLowerCase())) {
+        if (outFileName.contains(data.eventName!!.lowercase())) {
             content = content.replace("Event".toRegex(), data.eventName!!)
         }
         //replace view
-        if (outFileName.contains(data.viewFileName!!.toLowerCase())) {
+        if (outFileName.contains(data.viewFileName!!.lowercase())) {
             content = content.replace(
                 "'bloc.dart'",
-                ("'" + prefixName + data.blocName?.toLowerCase()).toString() + ".dart" + "'"
+                ("'" + prefixName + data.blocName?.lowercase()) + ".dart" + "'"
             )
             content = content.replace(
                 "'cubit.dart'",
-                ("'" + prefixName + data.cubitName?.toLowerCase()).toString() + ".dart" + "'"
+                ("'" + prefixName + data.cubitName?.lowercase()) + ".dart" + "'"
             )
-            content = content.replace("final bloc", "final " + data.blocName?.toLowerCase())
-            content = content.replace("final cubit", "final " + data.cubitName?.toLowerCase())
-            content = content.replace("=> bloc", "=> " + data.blocName?.toLowerCase())
-            content = content.replace("=> cubit", "=> " + data.cubitName?.toLowerCase())
+            content = content.replace("final bloc", "final " + data.blocName?.lowercase())
+            content = content.replace("final cubit", "final " + data.cubitName?.lowercase())
+            content = content.replace("=> bloc", "=> " + data.blocName?.lowercase())
+            content = content.replace("=> cubit", "=> " + data.cubitName?.lowercase())
             content = content.replace("nameCubit".toRegex(), "name" + data.cubitName)
             content = content.replace("nameBloc".toRegex(), "name" + data.blocName)
             content = content.replace(
                 "'event.dart'".toRegex(),
-                ("'" + prefixName + data.eventName?.toLowerCase()).toString() + ".dart'"
+                ("'" + prefixName + data.eventName?.lowercase()) + ".dart'"
             )
             content = content.replace("Event".toRegex(), data.eventName!!)
             content = content.replace("'state.dart'", "'" + prefixName + "state.dart'")
@@ -333,12 +311,12 @@ class NewBloc : AnAction() {
         val outSteam = ByteArrayOutputStream()
         try {
             val buffer = ByteArray(1024)
-            var len = -1
+            var len: Int
             while ((inStream.read(buffer).also { len = it }) != -1) {
                 outSteam.write(buffer, 0, len)
                 println(String(buffer))
             }
-        } catch (e: IOException) {
+        } catch (_: IOException) {
         } finally {
             outSteam.close()
             inStream.close()
@@ -368,11 +346,7 @@ class NewBloc : AnAction() {
         }
     }
 
-    private fun setPadding(btn: JRadioButton, top: Int, bottom: Int) {
-        btn.border = BorderFactory.createEmptyBorder(top, 10, bottom, 0)
-    }
-
-    private fun setMargin(btn: JCheckBox, top: Int, bottom: Int) {
+    private fun setPadding(btn: JRadioButton, top: Int = 5, bottom: Int=10) {
         btn.border = BorderFactory.createEmptyBorder(top, 10, bottom, 0)
     }
 

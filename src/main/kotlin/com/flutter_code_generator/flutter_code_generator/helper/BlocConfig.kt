@@ -19,5 +19,5 @@ object BlocConfig {
 
     //mode name
     const val modeDefault: String = "Cubit"
-    const val modeHigh: String = "Bloc"
+     const val modeHigh: String = "Bloc"
 }

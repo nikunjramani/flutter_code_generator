@@ -15,8 +15,8 @@ import com.intellij.util.IncorrectOperationException
 import com.flutter_code_generator.flutter_code_generator.intention_action.WrapHelper.Companion.callExpressionFinder
 import com.flutter_code_generator.flutter_code_generator.intention_action.WrapHelper.Companion.isSelectionValid
 
-abstract class WrapWithAction(val snippetType: SnippetType) : PsiElementBaseIntentionAction(), IntentionAction {
-    var callExpressionElement: PsiElement? = null
+abstract class WrapWithAction(private val snippetType: SnippetType) : PsiElementBaseIntentionAction(), IntentionAction {
+    private var callExpressionElement: PsiElement? = null
 
     override fun getFamilyName(): String {
         return text
@@ -24,9 +24,6 @@ abstract class WrapWithAction(val snippetType: SnippetType) : PsiElementBaseInte
 
 
     override fun isAvailable(project: Project, editor: Editor?, psiElement: PsiElement): Boolean {
-        if (psiElement == null) {
-            return false
-        }
 
         val currentFile = getCurrentFile(project, editor!!)
         if (currentFile != null && !currentFile.name.endsWith(".dart")) {
@@ -38,11 +35,7 @@ abstract class WrapWithAction(val snippetType: SnippetType) : PsiElementBaseInte
         }
 
         callExpressionElement = callExpressionFinder(psiElement)
-        if (callExpressionElement == null) {
-            return false
-        }
-
-        return true
+        return callExpressionElement != null
     }
 
 
@@ -52,7 +45,7 @@ abstract class WrapWithAction(val snippetType: SnippetType) : PsiElementBaseInte
         WriteCommandAction.runWriteCommandAction(project, runnable)
     }
 
-    protected fun invokeSnippetAction(project: Project, editor: Editor, snippetType: SnippetType?) {
+    private fun invokeSnippetAction(project: Project, editor: Editor, snippetType: SnippetType?) {
         val document = editor.document
 
         val element = callExpressionElement
@@ -71,7 +64,7 @@ abstract class WrapWithAction(val snippetType: SnippetType) : PsiElementBaseInte
         WriteCommandAction.runWriteCommandAction(
             project
         ) {
-            document.replaceString(offsetStart, offsetEnd, replaceWith!!)
+            document.replaceString(offsetStart, offsetEnd, replaceWith)
         }
 
         // place cursors to specify types:
@@ -83,7 +76,7 @@ abstract class WrapWithAction(val snippetType: SnippetType) : PsiElementBaseInte
         caretModel.removeSecondaryCarets()
 
         for (snippet in snippetArr) {
-            if (!replaceWith!!.contains(snippet!!)) {
+            if (!replaceWith.contains(snippet!!)) {
                 continue
             }
 

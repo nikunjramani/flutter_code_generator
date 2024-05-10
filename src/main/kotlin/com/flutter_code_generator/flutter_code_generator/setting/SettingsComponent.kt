@@ -17,11 +17,11 @@ class SettingsComponent {
 
     init {
         mainPanel = FormBuilder.createFormBuilder()
-            .addLabeledComponent(JBLabel("Bloc Name: "), blocName)
-            .addLabeledComponent(JBLabel("Cubit Name: "), cubitName)
-            .addLabeledComponent(JBLabel("Event Name: "), eventName)
-            .addLabeledComponent(JBLabel("View Name: "), viewName)
-            .addLabeledComponent(JBLabel("View File Name: "), viewFileName)
+            .addLabeledComponent(JBLabel("Bloc name: "), blocName)
+            .addLabeledComponent(JBLabel("Cubit name: "), cubitName)
+            .addLabeledComponent(JBLabel("Event name: "), eventName)
+            .addLabeledComponent(JBLabel("View name: "), viewName)
+            .addLabeledComponent(JBLabel("View file name: "), viewFileName)
             .addComponentFillVertically(JPanel(), 0)
             .panel
     }
